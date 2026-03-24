@@ -11,10 +11,11 @@ export interface IUser{
     name: string,
     email:string,
     image:string,
-    role:string
+    role:string,
+    restaurantId: string
 }
 
-export const isAuth = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
+export const isAuth = async (req: AuthenticationRequest, res: Response, next: NextFunction):Promise<void> => {
     try {
         const authHeader = req.headers.authorization
 
@@ -50,4 +51,16 @@ export const isAuth = async (req: AuthenticationRequest, res: Response, next: Ne
             message: "Please login - jwt error"
         })
     }
+}
+
+export const isSeller = async (req: AuthenticationRequest, res: Response, next: NextFunction):Promise<void> => {
+    const user = req.user
+
+    if (user && user.role !== "Seller") {
+        res.status(401).json({
+            message:"You are Not Authorized Seller"
+        })
+        return;
+    }
+    next();
 }

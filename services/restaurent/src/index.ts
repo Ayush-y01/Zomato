@@ -1,7 +1,7 @@
 import express  from "express";
 import dotenv from 'dotenv'
 import connnecDB from "./config/db.js";
-// import authRoute from "./routes/auth.js"
+import restaurantRoute from "./routes/restaurant.js"
 // import cors from "cors"
 
 dotenv.config()
@@ -13,6 +13,8 @@ app.use(express.json())
 // app.use("/api/auth", authRoute)
 
 const PORT = process.env.PORT || 5001
+
+app.use("/api/restaurant", )
 
 app.listen(PORT, ()=>{
     console.log(`Auth service runnig on ${PORT}`);
