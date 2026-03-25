@@ -14,8 +14,10 @@ router.post("/upload",async (req, res) => {
 
         
     } catch (error:any) {
-        res.status(500).json({
+        res.status(404).json({
             message: error.message
         })
     }
 })
+
+export default router;
