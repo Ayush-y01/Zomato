@@ -3,6 +3,7 @@ import type { IRestaurant } from "../types"
 import axios from "axios";
 import { restaurantService } from "../main";
 import AddRestaurant from "../components/AddRestaurant";
+import RestaurantProfile from "../components/RestaurantProfile";
 
 
 const Restaurant = () => {
@@ -23,6 +24,7 @@ const Restaurant = () => {
 
       if (data.token) {
         localStorage.setItem("token",data.token)
+        window.location.reload();
       }
 
     } catch (error) {
@@ -40,11 +42,13 @@ const Restaurant = () => {
   if (loading) return <div className="flex min-h-screen items-center justify-center"><p className="test-gray-500">Loading your restaurant</p></div>
 
   if (!restaurant) {
-    return <AddRestaurant />
+    return <AddRestaurant fetchMyRestaurant={fetchMyRestaurant} />
   }
 
   return (
-    <div>Restaurant</div>
+    <div className="min-h-screen bg-gray-500 px-4 py-6 space-y-6">
+      <RestaurantProfile restaurant={restaurant} onUpdate={setRestaurant} isSeller={true} />
+    </div>
   )
 }
 
