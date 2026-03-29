@@ -1,24 +1,25 @@
 import express from "express";
-import dotenv from 'dotenv';
-import cloudinary from "cloudinary";
+import dotenv from "dotenv";
 import cors from "cors";
-import uploadRoutes from './routes/cloudinary.js';
+import uploadRoutes from "./routes/cloudinary.js"; // (we’ll rename later if you want)
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-const { CLOUD_NAME, CLOUD_API_KEY, CLOUD_SECRET_KEY } = process.env;
-if (!CLOUD_NAME || !CLOUD_API_KEY || !CLOUD_SECRET_KEY) {
-    throw new Error("Missing Cloudinay env variable");
-}
-cloudinary.v2.config({
-    cloud_name: CLOUD_NAME,
-    api_key: CLOUD_API_KEY,
-    api_secret: CLOUD_SECRET_KEY
+// 🔥 ImageKit ENV check
+const { IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT, } = process.env;
+console.log("🔑 ImageKit Config:", {
+    publicKey: IMAGEKIT_PUBLIC_KEY ? "EXISTS" : "MISSING",
+    privateKey: IMAGEKIT_PRIVATE_KEY ? "EXISTS" : "MISSING",
+    urlEndpoint: IMAGEKIT_URL_ENDPOINT,
 });
+if (!IMAGEKIT_PUBLIC_KEY || !IMAGEKIT_PRIVATE_KEY || !IMAGEKIT_URL_ENDPOINT) {
+    throw new Error("Missing ImageKit env variables");
+}
+// routes
 app.use("/api", uploadRoutes);
 const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
-    console.log(`Utils service runnig on ${PORT}`);
+    console.log(`🚀 Utils service running on ${PORT}`);
 });

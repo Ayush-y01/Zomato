@@ -1,23 +1,53 @@
 import express from "express";
-import cloudinary from "cloudinary"
+import multer from "multer";
+import ImageKit from "imagekit";
+import dotenv from "dotenv";
+dotenv.config();
 
-const router = express.Router()
+const router = express.Router();
 
-router.post("/upload",async (req, res) => {
-    try {
-        const {buffer} = req.body
-        const cloud = await cloudinary.v2.uploader.upload(buffer)
+// ✅ Multer setup
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-        res.json({
-            url: cloud.secure_url,
-        })
+// ✅ ImageKit setup
+const imagekit = new ImageKit({
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
+  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT!,
+});
 
-        
-    } catch (error:any) {
-        res.status(500).json({
-            message: error.message
-        })
+// 🚀 Upload route
+router.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    console.log("📥 File received:", !!req.file);
+    console.log("📦 File size:", req.file?.size);
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: "No file uploaded",
+      });
     }
-})
+
+    const result = await imagekit.upload({
+      file: req.file.buffer, // ✅ direct buffer (no base64 needed)
+      fileName: req.file.originalname,
+    });
+
+    console.log("✅ Upload success:", result.url);
+
+    res.json({
+      url: result.url,
+    });
+
+  } catch (error: any) {
+    console.log("🔥 IMAGEKIT ERROR:", error);
+
+    res.status(500).json({
+      message: "Upload failed",
+      error: error.message,
+    });
+  }
+});
 
 export default router;
