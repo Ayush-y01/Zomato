@@ -49,7 +49,16 @@ const AddRestaurant = ({fetchMyRestaurant}:props) => {
             fetchMyRestaurant();
             
         } catch (error:any) {
-            toast.error(error.response.data.message)
+            console.log("FULL ERROR:", error);
+
+  if (error.response) {
+    console.log("Backend Error Data:", error.response.data);
+    console.log("Status:", error.response.status);
+  } else if (error.request) {
+    console.log("No response received:", error.request);
+  } else {
+    console.log("Error Message:", error.message);
+  }
         }finally{
             setSubmitting(false)
         }
