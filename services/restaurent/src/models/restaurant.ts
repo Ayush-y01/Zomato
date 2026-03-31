@@ -12,7 +12,7 @@ export interface IRestaurant extends Document{
     autoLocation:{
         type: "Point",
         coordinates:[ number, number],
-        formatedAddress: string,
+        formattedAddress: string,
     }
 
     isOpen: boolean,
@@ -55,7 +55,7 @@ const schema = new Schema<IRestaurant>({
             type:[Number],
             required: true
         },
-        formatedAddress:{
+        formattedAddress:{
             type:String
         }
     },
