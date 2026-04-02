@@ -35,37 +35,37 @@ export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) =>
 
     const file = req.file;
 
-    if (!file) {
-        return res.status(400).json({
-            message: "Please upload an image",
-        });
-    }
+        if (!file) {
+            return res.status(400).json({
+                message: "Please upload an image",
+            });
+        }
 
-    let uploadResult;
+        let uploadResult;
 
-    try {
-        // ✅ SEND FILE AS FORM DATA (NO base64, NO getBuffer)
-        const formData = new FormData();
-        formData.append("file", file.buffer, file.originalname);
+        try {
+            // ✅ SEND FILE AS FORM DATA (NO base64, NO getBuffer)
+            const formData = new FormData();
+            formData.append("file", file.buffer, file.originalname);
 
-        const response = await axios.post(
-            `${process.env.UTILS_SERVICE}/api/upload`,
-            formData,
-            {
-                headers: formData.getHeaders(),
-            }
-        );
+            const response = await axios.post(
+                `${process.env.UTILS_SERVICE}/api/upload`,
+                formData,
+                {
+                    headers: formData.getHeaders(),
+                }
+            );
 
-        uploadResult = response.data;
+            uploadResult = response.data;
 
-    } catch (error: any) {
-        console.log("🔥 UPLOAD SERVICE ERROR:", error?.response?.data || error.message);
+        } catch (error: any) {
+            console.log("🔥 UPLOAD SERVICE ERROR:", error?.response?.data || error.message);
 
-        return res.status(500).json({
-            message: "Image upload failed",
-            error: error?.response?.data || error.message,
-        });
-    }
+            return res.status(500).json({
+                message: "Image upload failed",
+                error: error?.response?.data || error.message,
+            });
+        }
 
 
     const newRestaurant = await RestaurantModel.create({
