@@ -27,16 +27,15 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
                     }
                 }
-            
             )
 
             toast.success(data.message)
-            setIsOpen(data.message.isOpen)
+            setIsOpen(data.restaurant.isOpen)
 
 
         } catch (error:any) {
             console.log(error);
-            toast.error(error.response.data.message)
+            toast.error(error?.response?.data?.message || "Something went wrong")
             
         }
     };
@@ -44,7 +43,7 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
     const saveChanges = async () => {
         try {
             setLoading(true)
-            const {data} = await axios.put(`${restaurantService}/api/restaurant`,
+            const {data} = await axios.put(`${restaurantService}/api/restaurant/edit`,
                 {name,description},{
                     headers: {
                         Authorization:`Bearer ${localStorage.getItem("token")}`
@@ -53,6 +52,7 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
             )
             onUpdate(data.restaurant)
             toast.success(data.message)
+            setEditMode(false)
         } catch (error) {
             console.log(error);
             toast.error("Faild to update")
@@ -82,7 +82,7 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
                             <div className="mt-1 flex items-center gap-2 text-sm text-gray-500 ">
                                 <BiMapPin className="h-4 w-4 text-red-500" />
                                 {
-                                    restaurant.autoLocation.formatedAddress || "location not avaiable"
+                                    restaurant.autoLocation?.formattedAddress  || "location not avaiable"
                                 }
                             </div>
                     </div>
@@ -96,7 +96,7 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
             {
                 editMode ? (<textarea value={description} onChange={e => setDescription(e.target.value)} 
                 className="w-full rounded border px-3 py-2 text-sm" />) :
-                ( <p className="text-sm text-gray-600"> {restaurant.description} || "No description Added" </p>)
+                ( <p className="text-sm text-gray-600"> {restaurant.description || "No description Added" } </p>)
             }
 
             <div className="flex items-center justify-between pt-3 border-t">
