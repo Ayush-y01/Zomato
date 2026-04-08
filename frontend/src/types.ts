@@ -37,9 +37,21 @@ export interface IRestaurant {
     autoLocation:{
         type: "Point",
         coordinates:[ number, number],
-        formatedAddress: string,
+        formattedAddress: string,
     }
 
     isOpen: boolean,
     createdAt: Date
+}
+
+export interface IMenuItem{
+    _id: string;
+    restaurantId: string
+    name:string
+    description: string
+    image: string
+    price: number
+    isAvailable: boolean
+    created_At: Date
+    updateAt: Date
 }
