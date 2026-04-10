@@ -4,6 +4,7 @@ import { AuthenticationRequest } from "../middlewares/isAuth.js";
 import TryCatch from "../middlewares/trycatch.js";
 import RestaurantModel from "../models/Restaurant.js";
 import jwt from "jsonwebtoken";
+import { count } from "console";
 
 export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) => {
     const user = req.user;
@@ -189,4 +190,62 @@ export const updateRestaurant = TryCatch(async(req: AuthenticationRequest, res) 
         message: "Restaurant Updated",
         restaurant,
     })
+})
+
+export const getNearByRestaurant = TryCatch(async(req, res) => {
+    const {latitude, longitude, radius = 5000 , search = ""} = req.query
+
+    if (!latitude || !longitude) {
+        return res.status(400).json({
+            message: "latitude and longitude is required"
+        })
+    }
+
+    const query: any = {
+        isVerified : true
+    }
+    if (search && typeof search === "string") {
+        query.name = {$regex: search, $option:"i"};
+    }
+
+    const restaurants = await RestaurantModel.aggregate([
+        {
+            $geoNear: {
+                near: {
+                    type:"Point",
+                    coordinates:[Number(longitude), Number(latitude)]
+                },
+                distanceField:"distance",
+                maxDistance: Number(radius),
+                spherical: true,
+                query,
+            }
+        },
+        {
+            $sort:{
+                isOpen: -1,
+                distance: 1,
+            }
+        },
+        {
+            $addFields:{
+                distanceKm:{
+                    $round:[{$divide: ["$distance", 1000]}, 2],
+                },
+            },
+        }
+    ])
+
+    res.json({
+        success: true,
+        count: restaurants.length,
+        restaurants
+    })
+    
+})
+
+export const fetchSingleRestaurant = TryCatch(async(req, res)=>{
+    const restaurant = await RestaurantModel.findById(req.params.id)
+
+    res.json(restaurant)
 })
