@@ -5,6 +5,6 @@ import uploadFile from "../middlewares/multer.js";
 const router = express.Router();
 router.post("/new", isAuth, isSeller, uploadFile, addmenuItem);
 router.get("/all/:id", isAuth, isSeller, fetchMenuItem);
-router.delete("/:id", isAuth, isSeller, deleteMenuItem);
-router.delete("/status/:id", isAuth, isSeller, toggleMenuItemAvailability);
+router.delete("/:itemId", isAuth, isSeller, deleteMenuItem);
+router.put("/status/:itemId", isAuth, isSeller, toggleMenuItemAvailability);
 export default router;

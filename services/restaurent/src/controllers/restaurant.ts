@@ -1,5 +1,5 @@
 import axios from "axios";
-import FormData from "form-data"; // ✅ IMPORTANT
+import FormData from "form-data"; 
 import { AuthenticationRequest } from "../middlewares/isAuth.js";
 import TryCatch from "../middlewares/trycatch.js";
 import RestaurantModel from "../models/Restaurant.js";
@@ -15,7 +15,6 @@ export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) =>
         });
     }
 
-    // 🔍 Check existing restaurant
     const existingRestaurant = await RestaurantModel.findOne({
         ownerId: user._id,
     });
@@ -26,7 +25,30 @@ export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) =>
         });
     }
 
-    const { name, description, latitude, longitude, formattedAddress, phone } = req.body;
+    const { name, description, latitude, longitude, phone } = req.body;
+
+    let formattedAddress = "Address not available";
+
+try {
+    const geoRes = await axios.get(
+        "https://nominatim.openstreetmap.org/reverse",
+        {
+            params: {
+                lat: latitude,
+                lon: longitude,
+                format: "json",
+            },
+            headers: {
+                "User-Agent": "restaurant-app",
+            },
+        }
+    );
+
+    formattedAddress = geoRes.data.display_name || "Address not available";
+
+} catch (error: any) {
+    console.log("Geo error:", error.message);
+}
 
     if (!name || !latitude || !longitude) {
         return res.status(400).json({
@@ -45,7 +67,6 @@ export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) =>
         let uploadResult;
 
         try {
-            // ✅ SEND FILE AS FORM DATA (NO base64, NO getBuffer)
             const formData = new FormData();
             formData.append("file", file.buffer, file.originalname);
 
@@ -60,14 +81,13 @@ export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) =>
             uploadResult = response.data;
 
         } catch (error: any) {
-            console.log("🔥 UPLOAD SERVICE ERROR:", error?.response?.data || error.message);
+            console.log(" UPLOAD SERVICE ERROR:", error?.response?.data || error.message);
 
             return res.status(500).json({
                 message: "Image upload failed",
                 error: error?.response?.data || error.message,
             });
         }
-
 
     const newRestaurant = await RestaurantModel.create({
         name,
@@ -90,7 +110,6 @@ export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) =>
 });
 
 
-// ================= FETCH =================
 
 export const fetchMyRestaurant = TryCatch(async (req: AuthenticationRequest, res) => {
     if (!req.user) {
@@ -114,7 +133,7 @@ export const fetchMyRestaurant = TryCatch(async (req: AuthenticationRequest, res
             {
                 user: {
                     ...req.user,
-                    restaurantId: restaurant._id, // ✅ FIXED
+                    restaurantId: restaurant._id, 
                 },
             },
             process.env.JWT_SECRET as string,
@@ -150,7 +169,7 @@ export const updateStatusRestaurant = TryCatch(async (req: AuthenticationRequest
     const restaurant = await RestaurantModel.findOneAndUpdate(
         { ownerId: req.user._id,},
         {isOpen: status},
-        {new: true}    
+       { returnDocument: 'after' }    
     )
 
     if (!restaurant) {
@@ -178,7 +197,7 @@ export const updateRestaurant = TryCatch(async(req: AuthenticationRequest, res) 
     const restaurant = await RestaurantModel.findOneAndUpdate(
         {ownerId: req.user._id},
         {name: name, description:description},
-        {new: true}
+        { returnDocument: 'after' }
     )
     if (!restaurant) {
         return res.status(404).json({
@@ -192,57 +211,58 @@ export const updateRestaurant = TryCatch(async(req: AuthenticationRequest, res) 
     })
 })
 
-export const getNearByRestaurant = TryCatch(async(req, res) => {
-    const {latitude, longitude, radius = 5000 , search = ""} = req.query
+export const getNearByRestaurant = TryCatch(async (req, res) => {
+    const { latitude, longitude, radius = 5000, search = "" } = req.query;
 
     if (!latitude || !longitude) {
         return res.status(400).json({
-            message: "latitude and longitude is required"
-        })
+            message: "latitude and longitude is required",
+        });
     }
 
     const query: any = {
-        isVerified : true
-    }
+        isVerified: true,
+    };
+
     if (search && typeof search === "string") {
-        query.name = {$regex: search, $option:"i"};
+        query.name = { $regex: search, $options: "i" };
     }
 
     const restaurants = await RestaurantModel.aggregate([
         {
             $geoNear: {
                 near: {
-                    type:"Point",
-                    coordinates:[Number(longitude), Number(latitude)]
+                    type: "Point",
+                    coordinates: [Number(longitude), Number(latitude)],
                 },
-                distanceField:"distance",
+                distanceField: "distance",
                 maxDistance: Number(radius),
                 spherical: true,
+                key: "autoLocation", 
                 query,
-            }
+            },
         },
         {
-            $sort:{
+            $sort: {
                 isOpen: -1,
                 distance: 1,
-            }
+            },
         },
         {
-            $addFields:{
-                distanceKm:{
-                    $round:[{$divide: ["$distance", 1000]}, 2],
+            $addFields: {
+                distanceKm: {
+                    $round: [{ $divide: ["$distance", 1000] }, 2],
                 },
             },
-        }
-    ])
+        },
+    ]);
 
     res.json({
         success: true,
         count: restaurants.length,
-        restaurants
-    })
-    
-})
+        restaurants,
+    });
+});
 
 export const fetchSingleRestaurant = TryCatch(async(req, res)=>{
     const restaurant = await RestaurantModel.findById(req.params.id)
