@@ -4,6 +4,7 @@ import { type IRestaurant, type IMenuItem } from "../types"
 import axios from "axios"
 import { restaurantService } from "../main"
 import RestaurantProfile from "../components/RestaurantProfile"
+import MenuItems from "../components/MenuItems"
 
 
 const RestaurantPage = () => {
@@ -38,7 +39,7 @@ const RestaurantPage = () => {
       })
       setMenuItems(data)
     } catch (error) {
-      console.log(error);
+      console.log("Cannot get the or check this this",error);
       
     }
   }
@@ -63,6 +64,9 @@ const RestaurantPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-6 space-y-6 ">
         <RestaurantProfile restaurant={restaurant} onUpdate={setRestaurant} isSeller={false} />
+        <div className="rounded-xl bg-white shadow-sm p-4">
+          <MenuItems isSeller={false} items={menuItems} onItemDeleted={() => {}} />
+        </div>
     </div>
   )
 }

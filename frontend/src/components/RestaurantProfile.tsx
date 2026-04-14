@@ -67,8 +67,7 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
             restaurant.image && (<img src={restaurant.image} alt="" className="h-48 w-full object-cover" />)
         }
         <div className="p-5 space-y-4">
-            {
-                isSeller && (<div className="flex items-center justify-between">
+           <div className="flex items-center justify-between">
                     <div>
                         {
                             editMode ? (
@@ -87,11 +86,10 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
                             </div>
                     </div>
 
-                    <button onClick={() => setEditMode(!editMode)} className="text-gray-500 hover:text-black">
+                    { isSeller && (<button onClick={() => setEditMode(!editMode)} className="text-gray-500 hover:text-black">
                             <BiEdit size={18} />
-                    </button>
+                    </button>)}
                 </div>
-            )}
             
             {
                 editMode ? (<textarea value={description} onChange={e => setDescription(e.target.value)} 
