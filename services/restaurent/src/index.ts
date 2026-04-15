@@ -4,6 +4,7 @@ import connnecDB from "./config/db.js";
 import restaurantRoute from "./routes/restaurant.js"
 import cors from "cors"
 import itemRoutes from "./routes/menuitem.js"
+import CartRoutes from "./routes/cart.js"
 
 dotenv.config()
 
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 5001
 
 app.use("/api/restaurant",restaurantRoute )
 app.use("/api/item", itemRoutes)
+app.use("/api/cart", CartRoutes)
 
 app.listen(PORT, ()=>{
     console.log(`Restaurant service runnig on ${PORT}`);

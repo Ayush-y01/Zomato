@@ -88,7 +88,13 @@ export const fetchMenuItem = TryCatch(async(req:AuthenticationRequest, res) => {
 
     const items = await MenuItems.find({restaurantId:id})
 
-    res.json(items )
+    if (!items) {
+        return res.status(401).json({
+            message:"Cannot get menu item check please"
+        })
+    }
+
+    res.json(items)
 })
 
 
