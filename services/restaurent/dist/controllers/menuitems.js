@@ -64,6 +64,11 @@ export const fetchMenuItem = TryCatch(async (req, res) => {
         });
     }
     const items = await MenuItems.find({ restaurantId: id });
+    if (!items) {
+        return res.status(401).json({
+            message: "Cannot get menu item check please"
+        });
+    }
     res.json(items);
 });
 export const deleteMenuItem = TryCatch(async (req, res) => {
