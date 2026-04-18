@@ -4,7 +4,6 @@ import { AuthenticationRequest } from "../middlewares/isAuth.js";
 import TryCatch from "../middlewares/trycatch.js";
 import RestaurantModel from "../models/Restaurant.js";
 import jwt from "jsonwebtoken";
-import { count } from "console";
 
 export const addRestaurant = TryCatch(async (req: AuthenticationRequest, res) => {
     const user = req.user;
