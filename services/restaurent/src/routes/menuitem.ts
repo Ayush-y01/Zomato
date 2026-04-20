@@ -7,7 +7,7 @@ const router = express.Router()
 
 
 router.post("/new", isAuth, isSeller,uploadFile, addmenuItem)
-router.get("/all/:id", isAuth, isSeller, fetchMenuItem)
+router.get("/all/:id", isAuth, fetchMenuItem)
 router.delete("/:itemId", isAuth,isSeller,deleteMenuItem)
 router.put("/status/:itemId", isAuth, isSeller, toggleMenuItemAvailability)
 
