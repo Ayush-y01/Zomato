@@ -1,6 +1,7 @@
 import TryCatch from "../middlewares/trycatch.js";
 import Address from "../models/address.js";
 import Carts from "../models/Carts.js";
+import Order from "../models/Order.js";
 import Restaurant from "../models/Restaurant.js";
 export const creatOrder = TryCatch(async (req, res) => {
     const user = req.user;
@@ -9,7 +10,7 @@ export const creatOrder = TryCatch(async (req, res) => {
             message: "Unauthorized"
         });
     }
-    const { paymentMethod, addressId } = req.body;
+    const { paymentMethod, addressId, distance } = req.body;
     if (!addressId) {
         return res.status(400).json({
             message: "address is required!!"
@@ -68,5 +69,59 @@ export const creatOrder = TryCatch(async (req, res) => {
     const deliveryFee = subtotal < 250 ? 49 : 0;
     const platfromFee = 7;
     const totalAmount = subtotal + deliveryFee + platfromFee;
-    const expiredAt = new Date(Date.now() + 15 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    const [longitude, latitude] = address.location.coordinates;
+    const riderAmount = Math.ceil(distance) * 17;
+    const order = await Order.create({
+        userId: user._id.toString(),
+        restaurantId: restaurantId.toString(),
+        restaurantName: restaurant.name,
+        riderId: null,
+        distance,
+        riderAmount,
+        subtotal,
+        deliveryFee,
+        platfromFee,
+        totalAmount,
+        addressId: address._id.toString(),
+        deliveryAddress: {
+            fromattedAddress: address.formattedAddress,
+            mobile: address.mobile,
+            latitude,
+            longitude
+        },
+        paymentMethod,
+        paymentStatus: "pending",
+        status: "placed",
+        expiresAt
+    });
+    await Carts.deleteMany({ userId: user._id });
+    res.json({
+        message: "order created succssfully",
+        orderId: order._id.toString(),
+        amount: totalAmount,
+    });
+});
+export const fetchOrderForPayment = TryCatch(async (req, res) => {
+    if (req.headers["x-internal-key"] !== process.env.INTERNAL_SERVICE_KEY) {
+        return res.status(403).json({
+            message: "Forbidden",
+        });
+    }
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+        return res.status(404).json({
+            message: "Order not Found"
+        });
+    }
+    if (order.paymentStatus !== "pending") {
+        return res.status(400).json({
+            message: "Order Already Paid"
+        });
+    }
+    res.json({
+        orderId: order._id,
+        amount: order.totalAmount,
+        currency: "INR"
+    });
 });

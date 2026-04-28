@@ -7,7 +7,12 @@ import itemRoutes from "./routes/menuitem.js";
 import CartRoutes from "./routes/cart.js";
 import addressRouter from "./routes/address.js";
 import axios from "axios";
+import OrderRoutes from "./routes/order.js";
+import { connectRabbitMQ } from "./config/rabbitmq.js";
+import { startPaymentConsumer } from "./config/payment.consumer.js";
 dotenv.config();
+await connectRabbitMQ();
+startPaymentConsumer();
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -16,6 +21,7 @@ app.use("/api/restaurant", restaurantRoute);
 app.use("/api/item", itemRoutes);
 app.use("/api/cart", CartRoutes);
 app.use("/api/address", addressRouter);
+app.use("/api/order", OrderRoutes);
 app.get("/api/geocode/reverse", async (req, res) => {
     const { lat, lng } = req.query;
     try {

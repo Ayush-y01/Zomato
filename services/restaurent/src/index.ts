@@ -8,8 +8,13 @@ import CartRoutes from "./routes/cart.js"
 import addressRouter from "./routes/address.js"
 import axios from "axios";
 import OrderRoutes from "./routes/order.js"
+import { connectRabbitMQ } from "./config/rabbitmq.js";
+import { startPaymentConsumer } from "./config/payment.consumer.js";
 
 dotenv.config()
+
+await connectRabbitMQ()
+startPaymentConsumer()
 
 const app = express()
 app.use(cors())
