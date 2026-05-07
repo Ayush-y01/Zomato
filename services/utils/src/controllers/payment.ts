@@ -24,7 +24,7 @@ const razorpayOrder = await razorpay.orders.create({
 
     res.json({
         razorpayOrderId: razorpayOrder.id,
-        key:process.env.RAZORPAY_KEY_SECRET, 
+        key:process.env.RAZORPAY_KEY_ID, 
     })
 }
 
