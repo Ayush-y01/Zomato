@@ -4,6 +4,7 @@ import cors from "cors";
 import uploadRoutes from "./routes/cloudinary.js"; // (we’ll rename later if you want)
 import { connectRabbitMQ } from "./config/rabbitmq.js";
 import PaymentRouter from './routes/payment.js'
+import { createRazorpayorder, payWithStripe, verfiyStripe, verifyRazorpayPayment } from "./controllers/payment.js";
 
 dotenv.config();
 
@@ -34,6 +35,10 @@ if (!IMAGEKIT_PUBLIC_KEY || !IMAGEKIT_PRIVATE_KEY || !IMAGEKIT_URL_ENDPOINT) {
 
 app.use("/api", uploadRoutes);
 app.use("/api/payment", PaymentRouter);
+app.post("/create", createRazorpayorder);
+app.post("/verify", verifyRazorpayPayment)
+app.post("/stripe/create", payWithStripe);
+app.post("/stripe/verify", verfiyStripe)
 
 const PORT = process.env.PORT || 5002;
 
