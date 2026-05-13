@@ -180,6 +180,14 @@ return (
             </div>
           </div>
 
+           {subTotal < 250 && (
+              <p className="text-sm text-gray-500">
+                Add Item worth ${250 - subTotal} more
+                to get Free delivery
+              </p>
+            )}
+
+
           <div className="my-5 border-t pt-4 flex justify-between text-lg font-bold">
             <span>Total</span>
             <span className="text-green-600">₹{grandTotal}</span>

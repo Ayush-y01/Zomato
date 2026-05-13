@@ -6,6 +6,7 @@ import AddRestaurant from "../components/AddRestaurant";
 import RestaurantProfile from "../components/RestaurantProfile";
 import MenuItems from "../components/MenuItems";
 import AddMenuItem from "../components/AddMenuItem";
+import RestaurantOrder from "../components/RestaurantOrder";
 
 type SellerTab = "menu" | "add-item" | "sales";
 
@@ -78,6 +79,8 @@ const Restaurant = () => {
   return (
     <div className="min-h-screen bg-gray-500 px-4 py-6 space-y-6">
       <RestaurantProfile restaurant={restaurant} onUpdate={setRestaurant} isSeller={true} />
+
+      <RestaurantOrder restaurantId={restaurant._id} />
 
 
       <div className="rounded-xl bg-white shadow-sm ">
