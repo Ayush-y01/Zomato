@@ -63,7 +63,7 @@ const Orders = () => {
 
   if (orders.length === 0) {
     return <div className="flex min-h-60vh items-center justify-center">
-      <p className="text-gray-500">No Order yet</p>
+      <p className="text-gray-500">No Orders yet</p>
     </div>
   }
 
