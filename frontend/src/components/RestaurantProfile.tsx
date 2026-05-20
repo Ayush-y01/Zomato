@@ -4,6 +4,7 @@ import axios from "axios";
 import { restaurantService } from "../main";
 import toast from "react-hot-toast";
 import { BiEdit, BiMapPin, BiSave } from "react-icons/bi";
+import { useAppData } from "../context/AppContext";
 
 interface props {
     restaurant: IRestaurant;
@@ -60,6 +61,25 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
             setLoading(false)
         }
     }
+
+    const {setIsAuth, setUser} = useAppData()
+
+   const logoutHandler =async () => {
+
+    await axios.post(`${restaurantService}/api/restaurant/status`,
+                {status : false},
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    }
+                }
+            )
+
+    localStorage.setItem("token", "")
+    setIsAuth(false)
+    setUser(null)
+    toast.success("logout Succssfully !!")
+   } 
  
   return (
     <div className="mx-auto max-w-xl rounded-xl bg-white overflow-hidden">
@@ -115,6 +135,13 @@ const RestaurantProfile = ({restaurant, isSeller, onUpdate}:props) => {
                             : "bg-green-500 hover:bg-green-700"
                         }`}>
                              {isOpen ? "Close Restaurant" : "Open Restaurant"} </button> )
+                    }
+
+                    {
+                        isSeller && ( <button onClick={logoutHandler} 
+                        className={`rounded-lg px-1.5 text-sm font-medium text-white bg-red-500 hover:bg-red-700
+                        }`}>
+                             Logout </button> )
                     }
                 </div>
             </div>
