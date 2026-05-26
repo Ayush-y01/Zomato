@@ -105,7 +105,7 @@ export const fetchMyProfile = TryCatch(async(req:AuthenticationRequest, res) => 
     res.json(account);
 });
 
-export const toggleAvailbility = TryCatch(async(req:AuthenticationRequest, res) => {
+export const toggleRiderAvailbility = TryCatch(async(req:AuthenticationRequest, res) => {
     const user = req.user;
     
     if (!user) {
